@@ -9,28 +9,27 @@ import org.slf4j.LoggerFactory;
 import java.io.File;
 import java.io.IOException;
 import java.util.Date;
+import java.util.Map;
 
 /**
  * Created by cobr123 on 30.08.2015.
  */
 public final class Downloader {
     private static final Logger logger = LoggerFactory.getLogger(Downloader.class);
-    private static final String baseUri = "http://alena-shop.ru/";
+    public static final String baseUri = "http://alena-shop.ru/";
 
-    public static File get(final String url) throws IOException {
-        return get(url, "");
+    public static File get(final String url, final Map<String, String> loginCookies) throws IOException {
+        return get(url, "", loginCookies);
     }
 
     public static String getClearedUrl(final String url, final String referrer) {
-        String clearedUrl;
         if (referrer != null && !referrer.isEmpty()) {
             final String[] parts = url.split("/");
             final String page = File.separator + parts[parts.length - 2] + File.separator + parts[parts.length - 1];
-            clearedUrl = referrer.replace("http://", "").replace("/", File.separator) + page;
+            return referrer.replace("http://", "").replace("/", File.separator) + page;
         } else {
-            clearedUrl = url.replace("http://", "").replace("/", File.separator);
+            return url.replace("http://", "").replace("/", File.separator);
         }
-        return clearedUrl;
     }
 
     public static void invalidateCache(final String url) throws IOException {
@@ -54,19 +53,19 @@ public final class Downloader {
         }
     }
 
-    public static File get(final String url, final String referrer) throws IOException {
+    public static File get(final String url, final String referrer, final Map<String, String> loginCookies) throws IOException {
         final String clearedUrl = getClearedUrl(url, referrer);
         final String fileToSave = Utils.getDir() + clearedUrl + ".html";
         final File file = new File(fileToSave);
         if (file.exists() && Utils.equalsWoTime(new Date(file.lastModified()), new Date())) {
-            logger.trace("¬ÁˇÚ ËÁ Í˝¯‡: {}", file.getAbsolutePath());
+            logger.trace("–í–∑—è—Ç –∏–∑ –∫—ç—à–∞: {}", file.getAbsolutePath());
         } else {
-            logger.trace("«‡ÔÓ¯ÂÌ ‡‰ÂÒ: {}", url);
+            logger.trace("–ó–∞–ø—Ä–æ—à–µ–Ω –∞–¥—Ä–µ—Å: {}", url);
 
             final int maxTriesCnt = 3;
             for (int tries = 1; tries <= maxTriesCnt; ++tries) {
                 try {
-                    final Connection conn = Jsoup.connect(url);
+                    final Connection conn = Jsoup.connect(url).cookies(loginCookies);
                     if (referrer != null && !referrer.isEmpty()) {
                         logger.trace("referrer: {}", referrer);
                         conn.referrer(referrer);
@@ -75,8 +74,8 @@ public final class Downloader {
                     Utils.writeFile(fileToSave, doc.outerHtml());
                     break;
                 } catch (final IOException e) {
-                    logger.error("Œ¯Ë·Í‡ ÔË Á‡ÔÓÒÂ, ÔÓÔ˚ÚÍ‡ #{}: {}", tries, url);
-                    logger.error("Œ¯Ë·Í‡: ", e);
+                    logger.error("–û—à–∏–±–∫–∞ –ø—Ä–∏ –∑–∞–ø—Ä–æ—Å–µ, –ø–æ–ø—ã—Ç–∫–∞ #{}: {}", tries, url);
+                    logger.error("–û—à–∏–±–∫–∞: ", e);
                     if (maxTriesCnt == tries) {
                         throw new IOException(e);
                     } else {
@@ -96,18 +95,41 @@ public final class Downloader {
         }
     }
 
-    public static Document getDoc(final String url) throws IOException {
-        return getDoc(url, "");
+    public static Document getDoc(final String url, final Map<String, String> loginCookies) throws IOException {
+        return getDoc(url, "", loginCookies);
     }
 
-    public static Document getDoc(final String url, final String referrer) throws IOException {
-        final File input = Downloader.get(url, referrer);
+    public static Document getDoc(final String url, final String referrer, final Map<String, String> loginCookies) throws IOException {
+        final File input = Downloader.get(url, referrer, loginCookies);
         return Jsoup.parse(input, "UTF-8", baseUri);
     }
 
     public static void main(final String[] args) throws IOException {
+        final Connection.Response initHtml = Jsoup.connect(Downloader.baseUri).execute();
+        final Map<String, String> initHtmlCookies = initHtml.cookies();
+        final String authenticityTokenStr = initHtml.parse().select("input[name=authenticity_token]").val();
+        //System.out.println(authenticityTokenStr);
+
+        final Connection.Response res = Jsoup
+                .connect(Downloader.baseUri + "clients/sign_in")
+                .data("client[email]", "optovik20@alena-shop.ru"
+                        , "client[password]", "optovik20"
+                         , "utf8", "‚úì"
+                        , "authenticity_token", authenticityTokenStr
+                         , "commit", "–í–•–û–î"
+                )
+                .cookies(initHtmlCookies)
+                .method(Connection.Method.POST)
+                .userAgent("Mozilla/5.0 (Windows NT 6.1; Win64; x64; rv:25.0) Gecko/20100101 Firefox/25.0")
+                .timeout(12000)
+                .followRedirects(true)
+                .ignoreContentType(true)
+                .execute();
+        final Map<String, String> loginCookies = res.cookies();
+
         final String url = baseUri + "wear/devochkam";
-        final Document doc = Jsoup.connect(url).get();
+        final Document doc = getDoc(url, loginCookies);
         Utils.writeFile(getFileToSave(url), doc.outerHtml());
+        System.out.println(getFileToSave(url));
     }
 }

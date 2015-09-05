@@ -106,3 +106,4 @@ public final class Utils {
         return getZeroTimeDate(date1).equals(getZeroTimeDate(date2));
     }
 }
+
