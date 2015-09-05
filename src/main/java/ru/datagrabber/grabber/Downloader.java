@@ -54,8 +54,7 @@ public final class Downloader {
     }
 
     public static File get(final String url, final String referrer, final Map<String, String> loginCookies) throws IOException {
-        final String clearedUrl = getClearedUrl(url, referrer);
-        final String fileToSave = Utils.getDir() + clearedUrl + ".html";
+        final String fileToSave = getFileToSave(url, referrer);
         final File file = new File(fileToSave);
         if (file.exists() && Utils.equalsWoTime(new Date(file.lastModified()), new Date())) {
             logger.trace("Взят из кэша: {}", file.getAbsolutePath());
@@ -129,7 +128,6 @@ public final class Downloader {
 
         final String url = baseUri + "wear/devochkam";
         final Document doc = getDoc(url, loginCookies);
-        Utils.writeFile(getFileToSave(url), doc.outerHtml());
         System.out.println(getFileToSave(url));
     }
 }
