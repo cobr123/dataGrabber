@@ -13,24 +13,26 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created by cobr123 on 05.09.2015.
  */
 public class Main {
     public static void main(final String[] args) throws IOException {
+        final Map<String, String> loginCookies = Downloader.getCookies();
         final List<Product> list = new ArrayList<Product>();
         //товары для мальчиков
-        final List<Product> list1 = ParseProductList.parse(Downloader.baseUri + "wear/malchikam");
+        final List<Product> list1 = ParseProductList.parse(Downloader.baseUri + "/wear/malchikam", loginCookies);
         list.addAll(list1);
         //товары для девочек
-        final List<Product> list2 = ParseProductList.parse(Downloader.baseUri + "wear/devochkam");
+        final List<Product> list2 = ParseProductList.parse(Downloader.baseUri + "/wear/devochkam", loginCookies);
         list.addAll(list2);
         //товары для малышей
-        final List<Product> list3 = ParseProductList.parse(Downloader.baseUri + "wear/rost-56_rost-62_rost-68_rost-74_rost-80");
+        final List<Product> list3 = ParseProductList.parse(Downloader.baseUri + "/wear/rost-56_rost-62_rost-68_rost-74_rost-80", loginCookies);
         list.addAll(list3);
         //аксессуары
-        final List<Product> list4 = ParseProductList.parse(Downloader.baseUri + "accessory");
+        final List<Product> list4 = ParseProductList.parse(Downloader.baseUri + "/accessory", loginCookies);
         list.addAll(list4);
         //создаём эксель и сохораняем в файл на рабочем столе
         createExcel(list);

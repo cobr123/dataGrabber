@@ -8,12 +8,12 @@ import java.util.List;
 public class Product {
     private final String name;
     private final String article;
-    private final Double price;
+    private final String price;
     //private final List<String> imgUrl;
     //private final List<String> size;
     private final String desc;
 
-    public Product(String name, String article, Double price, String desc) {
+    public Product(final String name,final String article,final String price,final String desc) {
         this.name = name;
         this.article = article;
         this.price = price;
@@ -28,12 +28,19 @@ public class Product {
         return article;
     }
 
-    public Double getPrice() {
+    public String getPrice() {
         return price;
     }
 
     public String getDesc() {
         return desc;
+    }
+
+    public void print() {
+        System.out.println("name = " + name);
+        System.out.println("article = " + article);
+        System.out.println("price = " + price);
+        System.out.println("desc = " + desc);
     }
 }
 

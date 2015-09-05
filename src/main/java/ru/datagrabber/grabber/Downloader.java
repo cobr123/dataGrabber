@@ -1,5 +1,6 @@
 package ru.datagrabber.grabber;
 
+import org.apache.commons.codec.digest.DigestUtils;
 import org.jsoup.Connection;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -16,20 +17,18 @@ import java.util.Map;
  */
 public final class Downloader {
     private static final Logger logger = LoggerFactory.getLogger(Downloader.class);
-    public static final String baseUri = "http://alena-shop.ru/";
+    public static final String baseUri = "http://alena-shop.ru";
+
+    public static File get(final String url) throws IOException {
+        return get(url, "", null);
+    }
 
     public static File get(final String url, final Map<String, String> loginCookies) throws IOException {
         return get(url, "", loginCookies);
     }
 
     public static String getClearedUrl(final String url, final String referrer) {
-        if (referrer != null && !referrer.isEmpty()) {
-            final String[] parts = url.split("/");
-            final String page = File.separator + parts[parts.length - 2] + File.separator + parts[parts.length - 1];
-            return referrer.replace("http://", "").replace("/", File.separator) + page;
-        } else {
-            return url.replace("http://", "").replace("/", File.separator);
-        }
+        return DigestUtils.md5Hex(url + referrer);
     }
 
     public static void invalidateCache(final String url) throws IOException {
@@ -64,7 +63,11 @@ public final class Downloader {
             final int maxTriesCnt = 3;
             for (int tries = 1; tries <= maxTriesCnt; ++tries) {
                 try {
-                    final Connection conn = Jsoup.connect(url).cookies(loginCookies);
+                    final Connection conn = Jsoup.connect(url);
+                    if (loginCookies != null && !loginCookies.isEmpty()) {
+                        logger.trace("cookies: {}", loginCookies);
+                        conn.cookies(loginCookies);
+                    }
                     if (referrer != null && !referrer.isEmpty()) {
                         logger.trace("referrer: {}", referrer);
                         conn.referrer(referrer);
@@ -94,28 +97,32 @@ public final class Downloader {
         }
     }
 
+    public static Document getDoc(final String url) throws IOException {
+        return getDoc(url, "", null);
+    }
+
     public static Document getDoc(final String url, final Map<String, String> loginCookies) throws IOException {
         return getDoc(url, "", loginCookies);
     }
 
     public static Document getDoc(final String url, final String referrer, final Map<String, String> loginCookies) throws IOException {
         final File input = Downloader.get(url, referrer, loginCookies);
-        return Jsoup.parse(input, "UTF-8", baseUri);
+        return Jsoup.parse(input, "UTF-8", baseUri + "/");
     }
 
-    public static void main(final String[] args) throws IOException {
-        final Connection.Response initHtml = Jsoup.connect(Downloader.baseUri).execute();
+    public static Map<String, String> getCookies() throws IOException {
+        final Connection.Response initHtml = Jsoup.connect(Downloader.baseUri + "/").execute();
         final Map<String, String> initHtmlCookies = initHtml.cookies();
         final String authenticityTokenStr = initHtml.parse().select("input[name=authenticity_token]").val();
         //System.out.println(authenticityTokenStr);
 
         final Connection.Response res = Jsoup
-                .connect(Downloader.baseUri + "clients/sign_in")
+                .connect(Downloader.baseUri + "/clients/sign_in")
                 .data("client[email]", "optovik20@alena-shop.ru"
                         , "client[password]", "optovik20"
-                         , "utf8", "✓"
+                        , "utf8", "✓"
                         , "authenticity_token", authenticityTokenStr
-                         , "commit", "ВХОД"
+                        , "commit", "ВХОД"
                 )
                 .cookies(initHtmlCookies)
                 .method(Connection.Method.POST)
@@ -124,10 +131,13 @@ public final class Downloader {
                 .followRedirects(true)
                 .ignoreContentType(true)
                 .execute();
-        final Map<String, String> loginCookies = res.cookies();
+        return res.cookies();
+    }
 
-        final String url = baseUri + "wear/devochkam";
-        final Document doc = getDoc(url, loginCookies);
-        System.out.println(getFileToSave(url));
+    public static void main(final String[] args) throws IOException {
+        final Map<String, String> loginCookies = Downloader.getCookies();
+        final String url = Downloader.baseUri + "/wear/devochkam";
+        final Document doc = Downloader.getDoc(url, loginCookies);
+        System.out.println(Downloader.getFileToSave(url));
     }
 }
