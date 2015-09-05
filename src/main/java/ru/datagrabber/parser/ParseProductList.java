@@ -3,6 +3,8 @@ package ru.datagrabber.parser;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import ru.datagrabber.data.Product;
 import ru.datagrabber.grabber.Downloader;
 
@@ -15,15 +17,17 @@ import java.util.Map;
  * Created by cobr123 on 05.09.2015.
  */
 public class ParseProductList {
+    private static final Logger logger = LoggerFactory.getLogger(ParseProductList.class);
+
     public static List<Product> parse(final String url, final Map<String, String> loginCookies) throws IOException {
         final List<Product> list = new ArrayList<Product>();
         String nextUrl = url;
         while (!nextUrl.isEmpty()) {
-            System.out.println("nextUrl = " + nextUrl);
-            System.out.println("getFileToSave = " + Downloader.getFileToSave(nextUrl));
+            logger.trace("nextUrl = ", nextUrl);
+            logger.trace("getFileToSave = ", Downloader.getFileToSave(nextUrl));
             final Document doc = Downloader.getDoc(nextUrl, loginCookies);
             final Elements elems = doc.select("div.img-wrap > a");
-            System.out.println("elems.size() = " + elems.size());
+            logger.trace("elems.size() = ", elems.size());
             for (final Element elem : elems) {
                 final Product product = ParseProduct.parse(Downloader.baseUri + elem.attr("href"), loginCookies);
                 list.add(product);

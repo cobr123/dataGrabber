@@ -4,6 +4,8 @@ import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.xssf.streaming.SXSSFWorkbook;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import ru.datagrabber.data.DataCell;
 import ru.datagrabber.data.Product;
 import ru.datagrabber.grabber.Downloader;
@@ -19,6 +21,8 @@ import java.util.Map;
  * Created by cobr123 on 05.09.2015.
  */
 public class Main {
+    private static final Logger logger = LoggerFactory.getLogger(Main.class);
+
     public static void main(final String[] args) throws IOException {
         final Map<String, String> loginCookies = Downloader.getCookies();
         final List<Product> list = new ArrayList<Product>();
@@ -63,10 +67,19 @@ public class Main {
     }
 
     private static void createCellsByProduct(final Row row,final Product product) {
+        row.createCell(DataCell.PRODUCT_URL.ordinal()).setCellValue(product.getUrl());
+        row.createCell(DataCell.NAME.ordinal()).setCellValue(product.getName());
         row.createCell(DataCell.ARTICLE.ordinal()).setCellValue(product.getArticle());
         row.createCell(DataCell.DESC.ordinal()).setCellValue(product.getDesc());
+
         row.createCell(DataCell.PRICE.ordinal()).setCellValue(product.getPrice());
-        row.createCell(DataCell.NAME.ordinal()).setCellValue(product.getName());
+        row.createCell(DataCell.SIZE.ordinal()).setCellValue(product.getSizes());
+
+        row.createCell(DataCell.IMG_MAIN.ordinal()).setCellValue(product.getImgMain());
+        row.createCell(DataCell.IMG_OTHERS.ordinal()).setCellValue(product.getImgOthers());
+
+        row.createCell(DataCell.MANUFACTURER_COUNTRY.ordinal()).setCellValue("Россия и СНГ");
+        row.createCell(DataCell.CITY_FROM.ordinal()).setCellValue("Санкт-Петербург");
     }
 
     private static void createTitle(final Sheet sh, final int rownum) {
