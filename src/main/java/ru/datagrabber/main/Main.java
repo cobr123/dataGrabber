@@ -8,6 +8,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import ru.datagrabber.data.DataCell;
 import ru.datagrabber.data.Product;
+import ru.datagrabber.data.ProductCategoryType;
 import ru.datagrabber.grabber.Downloader;
 import ru.datagrabber.parser.ParseProductList;
 
@@ -27,17 +28,17 @@ public class Main {
         final Map<String, String> loginCookies = Downloader.getCookies();
         final List<Product> list = new ArrayList<Product>();
         //товары для мальчиков
-        final List<Product> list1 = ParseProductList.parse(Downloader.baseUri + "/wear/malchikam", loginCookies);
+        final List<Product> list1 = ParseProductList.parse(ProductCategoryType.BOYS, Downloader.baseUri + "/wear/malchikam", loginCookies);
         list.addAll(list1);
         //товары для девочек
-        final List<Product> list2 = ParseProductList.parse(Downloader.baseUri + "/wear/devochkam", loginCookies);
-        list.addAll(list2);
+//        final List<Product> list2 = ParseProductList.parse(ProductCategoryType.GIRLS,Downloader.baseUri + "/wear/devochkam", loginCookies);
+//        list.addAll(list2);
         //товары для малышей
-        final List<Product> list3 = ParseProductList.parse(Downloader.baseUri + "/wear/rost-56_rost-62_rost-68_rost-74_rost-80", loginCookies);
-        list.addAll(list3);
+//        final List<Product> list3 = ParseProductList.parse(ProductCategoryType.BABIES, Downloader.baseUri + "/wear/rost-56_rost-62_rost-68_rost-74_rost-80", loginCookies);
+//        list.addAll(list3);
         //аксессуары
-        final List<Product> list4 = ParseProductList.parse(Downloader.baseUri + "/accessory", loginCookies);
-        list.addAll(list4);
+        //final List<Product> list4 = ParseProductList.parse(Downloader.baseUri + "/accessory", loginCookies);
+        //list.addAll(list4);
         //создаём эксель и сохораняем в файл на рабочем столе
         createExcel(list);
     }
