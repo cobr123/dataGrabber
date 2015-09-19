@@ -1,11 +1,12 @@
 package ru.datagrabber.data;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * Created by cobr123 on 05.09.2015.
  */
-public class Product {
+public final class Product {
     private final String url;
     private final String name;
     private final String article;
@@ -13,6 +14,7 @@ public class Product {
     private final String desc;
     private final List<String> imgUrl;
     private final List<String> size;
+    private final List<ProductCategory> category;
 
     public Product(final String url
             , final String name
@@ -21,6 +23,7 @@ public class Product {
             , final String desc
             , final List<String> imgUrl
             , final List<String> size
+            , final List<ProductCategory> category
     ) {
         this.url = url;
         this.name = name;
@@ -29,6 +32,7 @@ public class Product {
         this.desc = desc;
         this.imgUrl = imgUrl;
         this.size = size;
+        this.category = category;
     }
 
     public String getName() {
@@ -61,6 +65,13 @@ public class Product {
         return String.join("||", imgUrl.subList(1, imgUrl.size()));
     }
 
+    public String getCategories() {
+        if (category.isEmpty()) {
+            return "";
+        }
+        return String.join("||", category.stream().map(c -> c.getId().toString()).collect(Collectors.toList()));
+    }
+
     public String getSizes() {
         return String.join("||", size);
     }
@@ -78,6 +89,7 @@ public class Product {
         System.out.println("imgs.others = " + getImgOthers());
         System.out.println("size = " + getSizes());
         System.out.println("url = " + getUrl());
+        System.out.println("category = " + getCategories());
     }
 }
 
