@@ -7,6 +7,7 @@ import java.util.stream.Collectors;
  * Created by cobr123 on 05.09.2015.
  */
 public final class Product {
+    private final String id;
     private final String url;
     private final String name;
     private final String article;
@@ -16,7 +17,8 @@ public final class Product {
     private final List<String> size;
     private final List<ProductCategory> category;
 
-    public Product(final String url
+    public Product(final String id
+            , final String url
             , final String name
             , final String article
             , final String price
@@ -25,6 +27,7 @@ public final class Product {
             , final List<String> size
             , final List<ProductCategory> category
     ) {
+        this.id = id;
         this.url = url;
         this.name = name;
         this.article = article;
@@ -71,6 +74,12 @@ public final class Product {
         }
         return String.join("||", category.stream().map(c -> c.getId().toString()).collect(Collectors.toList()));
     }
+    public String getCategoryNames() {
+        if (category.isEmpty()) {
+            return "";
+        }
+        return String.join("||", category.stream().map(c -> c.getName()).collect(Collectors.toList()));
+    }
 
     public String getSizes() {
         return String.join("||", size);
@@ -80,7 +89,12 @@ public final class Product {
         return url;
     }
 
+    public String getId() {
+        return id;
+    }
+
     public void print() {
+        System.out.println("id = " + getId());
         System.out.println("name = " + getName());
         System.out.println("article = " + getArticle());
         System.out.println("price = " + getPrice());
@@ -90,6 +104,7 @@ public final class Product {
         System.out.println("size = " + getSizes());
         System.out.println("url = " + getUrl());
         System.out.println("category = " + getCategories());
+        System.out.println("category_name = " + getCategoryNames());
     }
 }
 

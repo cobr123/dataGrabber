@@ -1,5 +1,6 @@
 package ru.datagrabber.main;
 
+import org.apache.log4j.BasicConfigurator;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
@@ -12,8 +13,10 @@ import ru.datagrabber.data.ProductCategoryType;
 import ru.datagrabber.grabber.Downloader;
 import ru.datagrabber.parser.ParseProductList;
 
+import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -25,6 +28,9 @@ public class Main {
     private static final Logger logger = LoggerFactory.getLogger(Main.class);
 
     public static void main(final String[] args) throws IOException {
+        // Set up a simple configuration that logs on the console.
+        BasicConfigurator.configure();
+
         final Map<String, String> loginCookies = Downloader.getCookies();
         final List<Product> list = new ArrayList<Product>();
         //товары для мальчиков
@@ -57,7 +63,11 @@ public class Main {
             createCellsByProduct(row, product);
             ++rownum;
         }
-        final String filePath = System.getProperty("user.home") + "/Desktop/" + Downloader.baseUri.replace("http://", "").replace("/", "") + ".xlsx";
+        String desktopFolder = System.getProperty("user.home") + File.separatorChar+ "Desktop"+ File.separatorChar;
+        if(!new File(desktopFolder).exists()){
+             desktopFolder = System.getProperty("user.home") + File.separatorChar;
+        }
+        final String filePath = desktopFolder + Downloader.baseUri.replace("http://", "").replace("/", "") + ".xlsx";
         try (final FileOutputStream out = new FileOutputStream(filePath)) {
             wb.write(out);
             out.close();
@@ -68,6 +78,7 @@ public class Main {
     }
 
     private static void createCellsByProduct(final Row row,final Product product) {
+        row.createCell(DataCell.EXT_ID.ordinal()).setCellValue(product.getId());
         row.createCell(DataCell.PRODUCT_URL.ordinal()).setCellValue(product.getUrl());
         row.createCell(DataCell.NAME.ordinal()).setCellValue(product.getName());
         row.createCell(DataCell.ARTICLE.ordinal()).setCellValue(product.getArticle());
@@ -78,6 +89,7 @@ public class Main {
 
         row.createCell(DataCell.IMG_MAIN.ordinal()).setCellValue(product.getImgMain());
         row.createCell(DataCell.IMG_OTHERS.ordinal()).setCellValue(product.getImgOthers());
+        row.createCell(DataCell.CATEGORIES.ordinal()).setCellValue(product.getCategories());
 
         row.createCell(DataCell.MANUFACTURER_COUNTRY.ordinal()).setCellValue("Россия и СНГ");
         row.createCell(DataCell.CITY_FROM.ordinal()).setCellValue("Санкт-Петербург");
