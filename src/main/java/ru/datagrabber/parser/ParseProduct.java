@@ -1,5 +1,7 @@
 package ru.datagrabber.parser;
 
+import org.apache.commons.io.FilenameUtils;
+import org.apache.http.client.utils.URIUtils;
 import org.apache.log4j.BasicConfigurator;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -12,6 +14,8 @@ import ru.datagrabber.data.ProductCategoryType;
 import ru.datagrabber.grabber.Downloader;
 
 import java.io.IOException;
+import java.net.URI;
+import java.net.URL;
 import java.util.*;
 
 /**
@@ -104,7 +108,15 @@ public final class ParseProduct {
         logger.trace("imgElems.size() = " + imgElems.size());
         final List<String> imgs = new ArrayList<String>(imgElems.size());
         for (final Element elem : imgElems) {
-            imgs.add(elem.attr("src"));
+            final String imgSrc = elem.attr("src");
+            final int idx = imgSrc.lastIndexOf('/');
+            final String fileName = imgSrc.substring(idx + 1, imgSrc.length());
+            if (fileName.toLowerCase().startsWith("color_")) {
+                final String basePath = imgSrc.substring(0, idx + 1);
+                imgs.add(basePath + fileName.substring(6));
+            } else {
+                imgs.add(elem.attr("src"));
+            }
         }
 
         final Elements sizeElems = doc.select("div.size-radio > label > span");
