@@ -31,21 +31,22 @@ public class Main {
         // Set up a simple configuration that logs on the console.
         BasicConfigurator.configure();
 
+        logger.info("авторизация");
         final Map<String, String> loginCookies = Downloader.getCookies();
         final List<Product> list = new ArrayList<Product>();
-        //товары для мальчиков
+        logger.info("товары для мальчиков");
         final List<Product> list1 = ParseProductList.parse(ProductCategoryType.BOYS, Downloader.baseUri + "/wear/malchikam", loginCookies);
         list.addAll(list1);
-        //товары для девочек
+        logger.info("товары для девочек");
         final List<Product> list2 = ParseProductList.parse(ProductCategoryType.GIRLS,Downloader.baseUri + "/wear/devochkam", loginCookies);
         list.addAll(list2);
-        //товары для малышей
+        logger.info("товары для малышей");
         final List<Product> list3 = ParseProductList.parse(ProductCategoryType.BABIES, Downloader.baseUri + "/wear/rost-56_rost-62_rost-68_rost-74_rost-80", loginCookies);
         list.addAll(list3);
-        //аксессуары
+        //logger.info("аксессуары");
         //final List<Product> list4 = ParseProductList.parse(Downloader.baseUri + "/accessory", loginCookies);
         //list.addAll(list4);
-        //создаём эксель и сохораняем в файл на рабочем столе
+        logger.info("создаём эксель и сохораняем в файл на рабочем столе");
         createExcel(list);
     }
 
