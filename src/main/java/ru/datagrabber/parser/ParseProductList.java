@@ -33,19 +33,20 @@ public final class ParseProductList {
                 final Product product = ParseProduct.parse(type, Downloader.baseUri + elem.attr("href"), loginCookies);
                 list.add(product);
             }
-            nextUrl = Downloader.baseUri + doc.select("span.next > a").last().attr("href");
+            final Element next = doc.select("span.next > a").last();
+            if (next != null) {
+                nextUrl = Downloader.baseUri + next.attr("href");
+            } else {
+                nextUrl = "";
+            }
         }
         return list;
-    }
-
-    public static List<String> parse(final Document doc) {
-        return null;
     }
 
     public static void main(final String[] args) throws IOException {
 //        final Map<String, String> loginCookies = Downloader.getCookies();
         final String url = "http://alena-shop.ru/wear/devochkam";
-        final List<Product> products = ParseProductList.parse(ProductCategoryType.GIRLS,url, null);
+        final List<Product> products = ParseProductList.parse(ProductCategoryType.GIRLS, url, null);
         for (final Product product : products) {
             product.print();
         }
