@@ -37,11 +37,11 @@ public class Main {
         final List<Product> list1 = ParseProductList.parse(ProductCategoryType.BOYS, Downloader.baseUri + "/wear/malchikam", loginCookies);
         list.addAll(list1);
         //товары для девочек
-//        final List<Product> list2 = ParseProductList.parse(ProductCategoryType.GIRLS,Downloader.baseUri + "/wear/devochkam", loginCookies);
-//        list.addAll(list2);
+        final List<Product> list2 = ParseProductList.parse(ProductCategoryType.GIRLS,Downloader.baseUri + "/wear/devochkam", loginCookies);
+        list.addAll(list2);
         //товары для малышей
-//        final List<Product> list3 = ParseProductList.parse(ProductCategoryType.BABIES, Downloader.baseUri + "/wear/rost-56_rost-62_rost-68_rost-74_rost-80", loginCookies);
-//        list.addAll(list3);
+        final List<Product> list3 = ParseProductList.parse(ProductCategoryType.BABIES, Downloader.baseUri + "/wear/rost-56_rost-62_rost-68_rost-74_rost-80", loginCookies);
+        list.addAll(list3);
         //аксессуары
         //final List<Product> list4 = ParseProductList.parse(Downloader.baseUri + "/accessory", loginCookies);
         //list.addAll(list4);

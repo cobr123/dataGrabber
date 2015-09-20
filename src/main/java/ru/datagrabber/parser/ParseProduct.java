@@ -76,14 +76,22 @@ public final class ParseProduct {
 
     public static List<ProductCategory> findCategory(final String productName, final ProductCategoryType type) {
         final List<ProductCategory> cat = new ArrayList<ProductCategory>();
-        cat.add(category_kinds);
         switch (type) {
             case GIRLS:
+                cat.add(category_kinds);
                 cat.add(category_girls);
                 findCategory(productName, cat, category_for_girls);
                 break;
             case BOYS:
+                cat.add(category_kinds);
                 cat.add(category_boys);
+                findCategory(productName, cat, category_for_boys);
+                break;
+            case BABIES:
+                cat.add(category_kinds);
+                cat.add(category_boys);
+                cat.add(category_girls);
+                findCategory(productName, cat, category_for_girls);
                 findCategory(productName, cat, category_for_boys);
                 break;
         }

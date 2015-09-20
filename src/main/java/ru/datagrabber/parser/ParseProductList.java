@@ -34,7 +34,6 @@ public final class ParseProductList {
                 list.add(product);
             }
             nextUrl = Downloader.baseUri + doc.select("span.next > a").last().attr("href");
-            break;
         }
         return list;
     }
