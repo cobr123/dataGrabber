@@ -1,6 +1,9 @@
 package ru.datagrabber.data;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
@@ -68,12 +71,29 @@ public final class Product {
         return String.join("||", imgUrl.subList(1, imgUrl.size()));
     }
 
+    public void addCategories(final List<ProductCategory> categories) {
+        final Map<Integer, ProductCategory> newCategories = new HashMap<Integer, ProductCategory>();
+        for (final ProductCategory newCategory : categories) {
+            newCategories.put(newCategory.getId(), newCategory);
+        }
+        for (final ProductCategory oldCategory : category) {
+            newCategories.put(oldCategory.getId(), oldCategory);
+        }
+        category.clear();
+        category.addAll(newCategories.values());
+    }
+
+    public List<ProductCategory> getCategory() {
+        return category;
+    }
+
     public String getCategories() {
         if (category.isEmpty()) {
             return "";
         }
         return String.join("||", category.stream().map(c -> c.getId().toString()).collect(Collectors.toList()));
     }
+
     public String getCategoryNames() {
         if (category.isEmpty()) {
             return "";

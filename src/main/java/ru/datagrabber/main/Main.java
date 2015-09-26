@@ -17,9 +17,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Created by cobr123 on 05.09.2015.
@@ -38,7 +36,7 @@ public class Main {
         final List<Product> list1 = ParseProductList.parse(ProductCategoryType.BOYS, Downloader.baseUri + "/wear/malchikam", loginCookies);
         list.addAll(list1);
         logger.info("товары для девочек");
-        final List<Product> list2 = ParseProductList.parse(ProductCategoryType.GIRLS,Downloader.baseUri + "/wear/devochkam", loginCookies);
+        final List<Product> list2 = ParseProductList.parse(ProductCategoryType.GIRLS, Downloader.baseUri + "/wear/devochkam", loginCookies);
         list.addAll(list2);
         logger.info("товары для малышей");
         final List<Product> list3 = ParseProductList.parse(ProductCategoryType.BABIES, Downloader.baseUri + "/wear/rost-56_rost-62_rost-68_rost-74_rost-80", loginCookies);
@@ -46,8 +44,25 @@ public class Main {
         //logger.info("аксессуары");
         //final List<Product> list4 = ParseProductList.parse(Downloader.baseUri + "/accessory", loginCookies);
         //list.addAll(list4);
+        logger.info("объединяем категории товаров добавленных несколько раз");
+        final List<Product> uniqList = mergeProductCategories(list);
         logger.info("создаём эксель и сохораняем в файл на рабочем столе");
-        createExcel(list);
+        createExcel(uniqList);
+    }
+
+    private static List<Product> mergeProductCategories(final List<Product> list) {
+        final Map<String, Product> uniq = new HashMap<String, Product>();
+
+        for (final Product product : list) {
+            final Product ex = uniq.get(product.getId());
+            if (ex == null) {
+                uniq.put(product.getId(), product);
+            } else {
+                ex.addCategories(product.getCategory());
+            }
+        }
+
+        return new ArrayList<Product>(uniq.values());
     }
 
     private static void createExcel(final List<Product> list) throws IOException {
@@ -64,9 +79,9 @@ public class Main {
             createCellsByProduct(row, product);
             ++rownum;
         }
-        String desktopFolder = System.getProperty("user.home") + File.separatorChar+ "Desktop"+ File.separatorChar;
-        if(!new File(desktopFolder).exists()){
-             desktopFolder = System.getProperty("user.home") + File.separatorChar;
+        String desktopFolder = System.getProperty("user.home") + File.separatorChar + "Desktop" + File.separatorChar;
+        if (!new File(desktopFolder).exists()) {
+            desktopFolder = System.getProperty("user.home") + File.separatorChar;
         }
         final String filePath = desktopFolder + Downloader.baseUri.replace("http://", "").replace("/", "") + ".xlsx";
         try (final FileOutputStream out = new FileOutputStream(filePath)) {
@@ -78,7 +93,7 @@ public class Main {
         wb.dispose();
     }
 
-    private static void createCellsByProduct(final Row row,final Product product) {
+    private static void createCellsByProduct(final Row row, final Product product) {
         row.createCell(DataCell.EXT_ID.ordinal()).setCellValue(product.getId());
         row.createCell(DataCell.PRODUCT_URL.ordinal()).setCellValue(product.getUrl());
         row.createCell(DataCell.NAME.ordinal()).setCellValue(product.getName());
@@ -98,7 +113,7 @@ public class Main {
 
     private static void createTitle(final Sheet sh, final int rownum) {
         final Row row = sh.createRow(rownum);
-        for (final DataCell cap: DataCell.values()) {
+        for (final DataCell cap : DataCell.values()) {
             final Cell cell = row.createCell(cap.ordinal());
             cell.setCellValue(cap.getCaption());
         }

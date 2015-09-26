@@ -141,7 +141,7 @@ public final class ParseProduct {
         // Set up a simple configuration that logs on the console.
         BasicConfigurator.configure();
 //        final Map<String, String> loginCookies = Downloader.getCookies();
-        final String url = Downloader.baseUri + "/positions/660";
+        final String url = Downloader.baseUri + "/positions/1001";
         System.out.println(Downloader.getFileToSave(url));
         final Product product = ParseProduct.parse(ProductCategoryType.BOYS, url, null);
         product.print();
